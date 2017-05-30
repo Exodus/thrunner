@@ -15,7 +15,7 @@ log = []
 #Create the argument parser for options
 parser = argparse.ArgumentParser(description='Create threads for work on multiple servers')
 parser.add_argument('serverlist', type=file, help='File with the list of servers')
-parser.add_argument('params', help='quoted string with variable \%var\% to replace with host')
+parser.add_argument('params', help='quoted string with variable %%var%% to replace with host')
 parser.add_argument('-t', '--threads', type=int, default=2, help='Amount of threads to create')
 parser.add_argument('-e', '--email', help='Email the output to <email>')
 parser.add_argument('-o', '--output', help='Output file for processing')
