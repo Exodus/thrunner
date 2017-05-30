@@ -16,7 +16,7 @@ log = []
 parser = argparse.ArgumentParser(description='Create threads for work on multiple servers')
 parser.add_argument('serverlist', type=file, help='File with the list of servers')
 parser.add_argument('params', help='quoted string with variable %%var%% to replace with host')
-parser.add_argument('-t', '--threads', type=int, default=2, help='Amount of threads to create')
+parser.add_argument('-t', '--threads', type=int, help='Amount of threads to create')
 parser.add_argument('-e', '--email', help='Email the output to <email>')
 parser.add_argument('-o', '--output', help='Output file for processing')
 
@@ -34,8 +34,17 @@ if not any('%var%' in param for param in params):
 if not path.isfile(params[0]):
     exit('Executable file not found')
 
+
 # Getting the hosts from a file
 hosts = arg.serverlist.read().split()
+#threads = len(hosts) if len(hosts) <= 100 else 100
+
+# Set the amount of threads based on the list
+if arg.threads is None:
+    threads = len(hosts) if len(hosts) <= 100 else 100
+else:
+    threads = arg.threads
+print('Threads: {0}'.format(threads))
 
 # Thread running process
 def check_cert(i, q):
@@ -44,7 +53,7 @@ def check_cert(i, q):
         # Get a host from the queue
         host = q.get()
         parm = [p.replace('%var%',host) for p in params]
-        print('Thread-' + str(i) + ' Processing: ' + host + '\n')
+        print('Thread-{0} Processing: {1}'.format(str(i), host))
         pcheck = Popen(parm, shell=False, stdout=PIPE, stderr=PIPE)
         
         pout = pcheck.communicate()[0]
@@ -54,7 +63,7 @@ def check_cert(i, q):
         q.task_done()
 
 # Start the worker threads
-for i in range(arg.threads):
+for i in range(threads):
     worker = Thread(target=check_cert, args=(i, hostq))
     worker.setDaemon(True)
     worker.start()
