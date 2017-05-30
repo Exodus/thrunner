@@ -12,6 +12,11 @@ Example:
 Having a list of servers in a file:
 
 list:
+
 google.com
 linux.com
 github.com
+
+usage:
+
+`./thrunner.py -t 3 list "/bin/ping -c 3 %var%"`
