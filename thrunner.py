@@ -6,7 +6,6 @@ from os import path
 from threading import Thread
 from subprocess import Popen, PIPE
 
-
 #Global Initiators
 hostq = Queue.Queue()
 logq = Queue.Queue()
@@ -19,6 +18,7 @@ parser.add_argument('params', help='quoted string with variable %%var%% to repla
 parser.add_argument('-t', '--threads', type=int, help='Amount of threads to create')
 parser.add_argument('-e', '--email', help='Email the output to <email>')
 parser.add_argument('-o', '--output', help='Output file for processing')
+parser.add_argument('--noout', action='store_true', help='Do not display any output to the shell')
 
 # Python version argparse issue with a file not found
 try:
@@ -34,10 +34,8 @@ if not any('%var%' in param for param in params):
 if not path.isfile(params[0]):
     exit('Executable file not found')
 
-
 # Getting the hosts from a file
 hosts = arg.serverlist.read().split()
-#threads = len(hosts) if len(hosts) <= 100 else 100
 
 # Set the amount of threads based on the list
 if arg.threads is None:
@@ -74,12 +72,12 @@ for host in hosts:
 
 hostq.join()
 
-
 while True:
     try:
         log.append(logq.get_nowait())
     except Queue.Empty:
         break
 
-for entry in log:
-    print(entry)
+
+if arg.noout is False:
+    print(''.join(log))
