@@ -40,10 +40,10 @@ hosts = arg.serverlist.read().split()
 #threads = len(hosts) if len(hosts) <= 100 else 100
 
 # Set the amount of threads based on the list
-if arg.threads is None:
-    threads = len(hosts) if len(hosts) <= 100 else 100
-else:
+if arg.threads:
     threads = arg.threads
+else:
+    threads = len(hosts) if len(hosts) <= 100 else 100
 print('Threads: {0}'.format(threads))
 
 # Thread running process
