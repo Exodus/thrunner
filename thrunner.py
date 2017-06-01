@@ -2,6 +2,8 @@
 import argparse
 import shlex
 import Queue
+import re
+import smtplib
 from os import path
 from threading import Thread
 from subprocess import Popen, PIPE
@@ -10,6 +12,7 @@ from subprocess import Popen, PIPE
 hostq = Queue.Queue()
 logq = Queue.Queue()
 log = []
+emailregex = r"(^[a-zA-Z0-9_.+-]+@wellsfargo.com$)"
 
 #Create the argument parser for options
 parser = argparse.ArgumentParser(description='Create threads for work on multiple servers')
@@ -33,6 +36,13 @@ if not any('%var%' in param for param in params):
     exit('%var% not present')
 if not path.isfile(params[0]):
     exit('Executable file not found')
+
+# Validate email
+if arg.email is not None:
+    if re.match(emailregex, arg.email):
+        email = arg.email
+    else:
+        exit('Wrong email address.')
 
 # Getting the hosts from a file
 hosts = arg.serverlist.read().split()
@@ -78,6 +88,14 @@ while True:
     except Queue.Empty:
         break
 
-
+# Print if --noout unused.
 if arg.noout is False:
     print(''.join(log))
+
+# Email if -e --email used.
+try:
+    email
+    server = smtplib.SMTP('localhost')
+    server.sendmail('app@wellsfargo.com', email, ''.join(log))
+except NameError:
+    pass
