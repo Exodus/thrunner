@@ -12,7 +12,7 @@ from subprocess import Popen, PIPE
 hostq = Queue.Queue()
 logq = Queue.Queue()
 log = []
-emailregex = r"(^[a-zA-Z0-9_.+-]+@wellsfargo.com$)"
+emailregex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
 #Create the argument parser for options
 parser = argparse.ArgumentParser(description='Create threads for work on multiple servers')
@@ -96,6 +96,6 @@ if arg.noout is False:
 try:
     email
     server = smtplib.SMTP('localhost')
-    server.sendmail('app@wellsfargo.com', email, ''.join(log))
+    server.sendmail('app@example.com', email, ''.join(log))
 except NameError:
     pass
